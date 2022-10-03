@@ -12,9 +12,25 @@ app.set("view engine", "ejs");
 ///middleware to translate request body
 app.use(express.urlencoded({ extended: true }));
 
+///username database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+///generate random string as stand in for shortened URL
+
+const generateRandomString = function() {
+  let string = '';
+  const alphabet = "abcdefghijklmnopqrstuvwxyz"
+  for (let i = 0; i < 6; i++) {
+    if (Math.random() < 0.5) {
+      string += Math.floor(Math.random() * 10);
+    } else {
+      string += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+  }
+  return string;
 };
 
 ///defining routing
