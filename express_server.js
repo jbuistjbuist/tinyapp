@@ -22,7 +22,7 @@ const urlDatabase = {
 
 const generateRandomString = function() {
   let string = '';
-  const alphabet = "abcdefghijklmnopqrstuvwxyz"
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
   for (let i = 0; i < 6; i++) {
     if (Math.random() < 0.5) {
       string += Math.floor(Math.random() * 10);
@@ -49,16 +49,18 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req);
-  res.send("ok");
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  console.log(urlDatabase);
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  res.render(302, "urls_new");
 });
 
 app.get("/urls/:id", (req, res) => {
-  console.log(req);
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
 });
