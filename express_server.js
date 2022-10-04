@@ -35,20 +35,28 @@ const generateRandomString = function() {
   return string;
 };
 
-///defining routing
+////  DEFINING ROUTING   /////
+
+//for now, redirect requests to home to /urls
 
 app.get("/", (req, res) => {
   res.redirect(302, "/urls");
 });
 
+//function to get urls in JSON
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+//will render HTML template with list of urls shortened
 
 app.get("/urls", (req, res) => {
   const templateVars = {urls : urlDatabase, username : req.cookies["username"]};
   res.render("urls_index", templateVars);
 });
+
+//will generate a new short url, store in database, and redirect to /urls
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
@@ -57,22 +65,36 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+//when user submits login form, will store username as cookie with name username and redirect to /urls
+
 app.post("/login", (req, res) => {
   const username = req.body.username;
-  console.log(req.body.username);
   res
     .cookie('username', username)
     .redirect(302, '/urls');
 });
 
+//when user pressed logout button, will clear username cookie and redirect to /urls. login form should reappear
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect(302, '/urls');
+});
+
+//not sure what do do with this yet
+
 app.get("/urls/new", (req, res) => {
   res.render(302, "urls_new");
 });
+
+//will show a page with info for just requested url and option to edit long url
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username : req.cookies["username"]};
   res.render("urls_show", templateVars);
 });
+
+//upon submitting edit form, shorturl is associated to new provided longURL
 
 app.post("/urls/:id", (req, res) => {
   const newUrl = req.body.newUrl;
@@ -80,10 +102,14 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(302, "/urls");
 });
 
+//will delete long and short url from database when user presses delete button
+
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect(302, "/urls");
 });
+
+//will redirect to the actual longURL website
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];

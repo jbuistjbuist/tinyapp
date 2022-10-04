@@ -18,6 +18,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+
     <% if (typeof username !== 'undefined') {  %>
     <span class="navbar-text">Welcome, <%= username %>&nbsp;&nbsp;</span> 
       <form action="/logout" method="POST">
@@ -29,5 +30,6 @@
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
     <% } %>
+    
   </nav>
 </header>
