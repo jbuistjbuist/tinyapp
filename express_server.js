@@ -1,6 +1,7 @@
 ////calling dependencies
 const express = require("express");
 const app = express();
+const cookieParser = require('cookie-parser');
 
 ////defining port
 const PORT = 8080;
@@ -9,8 +10,9 @@ const PORT = 8080;
 ////setting view engine
 app.set("view engine", "ejs");
 
-///middleware to translate request body
+///middleware to translate request body and handle cookies
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 ///username database
 const urlDatabase = {
@@ -36,7 +38,7 @@ const generateRandomString = function() {
 ///defining routing
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect(302, "/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -54,6 +56,14 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = longURL;
   console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
+});
+
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  console.log(req.body.username);
+  res
+    .cookie('username', username)
+    .redirect(302, '/urls');
 });
 
 app.get("/urls/new", (req, res) => {
