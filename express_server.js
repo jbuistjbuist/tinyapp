@@ -6,7 +6,7 @@ const {urlDatabase, users} = require('./sitedata');
 const {generateRandomString, findUserEmail} = require('./helper_functions');
 
 ////defining port
-const PORT = 8081;
+const PORT = 8080;
 
 
 ////setting view engine
@@ -66,15 +66,13 @@ app.post("/register", (req, res) => {
       const message = `User already exists! Please log in to access your account`;
       const templateVars = { message, error : '400' };
       res
-        .status(400)
-        .render('error_page', templateVars);
+        .status(400).render('error_page', templateVars);
     }
   } else {
     const message = 'Please fill out the email and password fields to register';
     const templateVars = { message, error : '400' };
     res
-      .status(400)
-      .render('error_page', templateVars);
+      .status(400).render('error_page', templateVars);
   }
 });
 
@@ -87,36 +85,32 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = findUserEmail(email, users);
-  console.log(email, password, user);
+  
   if (user && user.password === password) {
+
     res
       .cookie('user_id', user.id)
       .redirect(302, '/urls');
   } else {
+
     const templateVars = {message : "User authentication failed", error : '403'};
-    res
-      .status(403)
-      .render('error_page', templateVars);
+    res.status(403);
+    res.render('error_page', templateVars);
   }
-
-
-
-
-  res
-    .redirect(302, '/urls');
 });
 
-//when user pressed logout button, will clear username cookie and redirect to /urls. login form should reappear
+//when user pressed logout button, will clear user_id cookie and redirect to /urls. login form should reappear
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect(302, '/urls');
 });
 
 //to submit a new url.
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {user : users[req.cookies["user_id"]]};
+  res.render("urls_new", templateVars);
 });
 
 //will show a page with info for just requested url and option to edit long url
