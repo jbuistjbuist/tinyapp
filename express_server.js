@@ -40,10 +40,21 @@ app.get("/urls", (req, res) => {
 //will generate a new short url, store in database, and redirect to /urls
 
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString();
-  const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect(302, `/urls/${shortURL}`);
+  const user = users[req.cookies["user_id"]];
+
+  if (user) {
+    const shortURL = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[shortURL] = longURL;
+    res.redirect(302, `/urls/${shortURL}`);
+  } else {
+    const templateVars = {message : 'You do not have permission to modify this URL. Please log in to continue', error : '401'};
+    res
+      .status(401)
+      .render("error_page", templateVars);
+  }
+
+
 });
 
 //route to the registration page
@@ -118,8 +129,15 @@ app.post("/logout", (req, res) => {
 //to submit a new url.
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {user : users[req.cookies["user_id"]]};
-  res.render("urls_new", templateVars);
+  let user = users[req.cookies["user_id"]];
+
+  if (user) {
+    const templateVars = { user };
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect(302, "/login");
+  }
+
 });
 
 //will show a page with info for just requested url and option to edit long url
