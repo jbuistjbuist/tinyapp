@@ -49,7 +49,12 @@ app.post("/urls", (req, res) => {
 //route to the registration page
 
 app.get("/register", (req, res) => {
-  res.render("urls_registration");
+  if (!req.cookies["user_id"]) {
+    res.render("urls_registration");
+  } else {
+    res.redirect(302, "/urls");
+  }
+  
 });
 
 //when receiving a post from registration page, create a new user in users object and set a user_id cookie. notify user if they didnt fill out the form or user already exists
@@ -78,7 +83,11 @@ app.post("/register", (req, res) => {
 
 
 app.get("/login", (req, res) => {
-  res.render('urls_login');
+  if (!req.cookies["user_id"]) {
+    res.render('urls_login');
+  } else {
+    res.redirect(302, "/urls");
+  }
 });
 
 app.post("/login", (req, res) => {
