@@ -154,8 +154,18 @@ app.get("/urls/new", (req, res) => {
 //will show a page with info for just requested url and option to edit long url
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user : users[req.cookies["user_id"]]};
-  res.render("urls_show", templateVars);
+  const user = users[req.cookies["user_id"]];
+  const userUrlIds = Object.keys(urlsForUser(user.id, urlDatabase));
+
+  if (user && userUrlIds.includes(req.params.id)) {
+    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user : users[req.cookies["user_id"]]};
+    res.render("urls_show", templateVars);
+  } else {
+    const templateVars = {message : 'You do not have permission to view this URL', error : '401', user};
+    res
+      .status(401)
+      .render("error_page", templateVars);
+  }
 });
 
 //upon submitting edit form, shorturl is associated to new provided longURL
@@ -180,7 +190,7 @@ app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(302, longURL);
   } else {
-    const templateVars = { message: `The page you are looking for does not exist`, error : '404'};
+    const templateVars = { message: `The page you are looking for does not exist`, error : '404', user : users[req.cookies['user_id']]};
     res
       .status(404)
       .render("error_page", templateVars);
