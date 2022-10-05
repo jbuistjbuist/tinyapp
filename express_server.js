@@ -16,21 +16,6 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-///generate random string as stand in for shortened URL
-
-const generateRandomString = function() {
-  let string = '';
-  const alphabet = "abcdefghijklmnopqrstuvwxyz";
-  for (let i = 0; i < 6; i++) {
-    if (Math.random() < 0.5) {
-      string += Math.floor(Math.random() * 10);
-    } else {
-      string += alphabet[Math.floor(Math.random() * alphabet.length)];
-    }
-  }
-  return string;
-};
-
 ////  DEFINING ROUTING   /////
 
 //for now, redirect requests to home to /urls
@@ -63,6 +48,14 @@ app.post("/urls", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("urls_registration");
+});
+
+app.post("/register", (req, res) => {
+  const randomID = `UID${generateRandomString()}`;
+  users[randomID] = {id : randomID, email : req.body.email, password : req.body.password};
+  res
+    .cookie('user_id', randomID)
+    .redirect('/urls');
 });
 
 //when user submits login form, will store username as cookie with name username and redirect to /urls
