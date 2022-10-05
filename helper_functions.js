@@ -11,4 +11,14 @@ const generateRandomString = function() {
   return string;
 };
 
-module.exports = {generateRandomString};
+const findUserEmail = function(email, data) {
+  for (let obj in data) {
+    let user = data[obj];
+    if (email === user.email) {
+      return user;
+    }
+  }
+  return null;
+};
+
+module.exports = {generateRandomString, findUserEmail};

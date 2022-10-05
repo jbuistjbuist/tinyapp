@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
 const {urlDatabase, users} = require('./sitedata');
-const {generateRandomString} = require('./helper_functions');
+const {generateRandomString, findUserEmail} = require('./helper_functions');
 
 ////defining port
 const PORT = 8081;
@@ -46,16 +46,36 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+//route to the registration page
+
 app.get("/register", (req, res) => {
   res.render("urls_registration");
 });
 
+//when receiving a post from registration page, create a new user in users object and set a user_id cookie. notify user if they didnt fill out the form or user already exists
+
 app.post("/register", (req, res) => {
-  const randomID = `UID${generateRandomString()}`;
-  users[randomID] = {id : randomID, email : req.body.email, password : req.body.password};
-  res
-    .cookie('user_id', randomID)
-    .redirect('/urls');
+  if (req.body.email && req.body.password) {
+    if (!findUserEmail(req.body.email, users)) {
+      const randomID = `UID${generateRandomString()}`;
+      users[randomID] = {id : randomID, email : req.body.email, password : req.body.password};
+      res
+        .cookie('user_id', randomID)
+        .redirect('/urls');
+    } else {
+      const message = 'User already exists! Please log in to access your account';
+      const templateVars = { message };
+      res
+        .status(400)
+        .render('error_400', templateVars);
+    }
+  } else {
+    const message = 'Please fill out the email and password fields to register';
+    const templateVars = { message };
+    res
+      .status(400)
+      .render('error_400', templateVars);
+  }
 });
 
 //when user submits login form, will store username as cookie with name username and redirect to /urls
