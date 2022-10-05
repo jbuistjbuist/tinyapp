@@ -165,8 +165,15 @@ app.post("/urls/:id/delete", (req, res) => {
 //will redirect to the actual longURL website
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(302, longURL);
+  if (urlDatabase[req.params.id]) {
+    const longURL = urlDatabase[req.params.id];
+    res.redirect(302, longURL);
+  } else {
+    const templateVars = { message: `The page you are looking for does not exist`, error : '404'};
+    res
+      .status(404)
+      .render("error_page", templateVars);
+  }
 });
 
 
