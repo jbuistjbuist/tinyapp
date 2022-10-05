@@ -2,9 +2,10 @@
 const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
+const {urlDatabase, users} = require('./sitedata');
 
 ////defining port
-const PORT = 8080;
+const PORT = 8081;
 
 
 ////setting view engine
@@ -13,12 +14,6 @@ app.set("view engine", "ejs");
 ///middleware to translate request body and handle cookies
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-///username database
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
 ///generate random string as stand in for shortened URL
 
@@ -65,6 +60,10 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+app.get("/register", (req, res) => {
+  res.render("urls_registration");
+});
+
 //when user submits login form, will store username as cookie with name username and redirect to /urls
 
 app.post("/login", (req, res) => {
@@ -81,10 +80,10 @@ app.post("/logout", (req, res) => {
   res.redirect(302, '/urls');
 });
 
-//not sure what do do with this yet
+//to submit a new url.
 
 app.get("/urls/new", (req, res) => {
-  res.render(302, "urls_new");
+  res.render("urls_new");
 });
 
 //will show a page with info for just requested url and option to edit long url
