@@ -43,7 +43,7 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(302, `/urls/${shortURL}`);
 });
 
 //route to the registration page
@@ -61,20 +61,20 @@ app.post("/register", (req, res) => {
       users[randomID] = {id : randomID, email : req.body.email, password : req.body.password};
       res
         .cookie('user_id', randomID)
-        .redirect('/urls');
+        .redirect(302, '/urls');
     } else {
-      const message = 'User already exists! Please log in to access your account';
-      const templateVars = { message };
+      const message = `User already exists! Please log in to access your account`;
+      const templateVars = { message, error : '400' };
       res
         .status(400)
-        .render('error_400', templateVars);
+        .render('error_page', templateVars);
     }
   } else {
     const message = 'Please fill out the email and password fields to register';
-    const templateVars = { message };
+    const templateVars = { message, error : '400' };
     res
       .status(400)
-      .render('error_400', templateVars);
+      .render('error_page', templateVars);
   }
 });
 
@@ -84,9 +84,25 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = findUserEmail(email, users);
+  console.log(email, password, user);
+  if (user && user.password === password) {
+    res
+      .cookie('user_id', user.id)
+      .redirect(302, '/urls');
+  } else {
+    const templateVars = {message : "User authentication failed", error : '403'};
+    res
+      .status(403)
+      .render('error_page', templateVars);
+  }
+
+
+
+
   res
-    .cookie('username', username)
     .redirect(302, '/urls');
 });
 
@@ -129,7 +145,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  res.redirect(302, longURL);
 });
 
 
