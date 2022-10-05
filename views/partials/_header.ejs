@@ -25,9 +25,11 @@
         <button type="submit" class="btn btn-danger">Logout</button>
       </form>
     <% } else { %>
-    <form action="/login" method="POST">
-      <input id="login" type="text" class="rounded border-light" name="username" placeholder="Username here...">
-      <button type="submit" class="btn btn-primary">Login</button>
+    <form action="/login" method="GET">
+      <button type="submit" class="btn btn-primary mr-3">Login</button>
+    </form>
+    <form action="/register" method="GET">
+      <button type="submit" class="btn btn-dark">Register</button>
     </form>
     <% } %>
     

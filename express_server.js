@@ -78,7 +78,10 @@ app.post("/register", (req, res) => {
   }
 });
 
-//when user submits login form, will store username as cookie with name username and redirect to /urls
+
+app.get("/login", (req, res) => {
+  res.render('urls_login');
+});
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
