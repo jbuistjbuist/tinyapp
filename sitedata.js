@@ -1,7 +1,13 @@
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "UID53xyab",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "UID67xy12",
+  },
 };
 
 const users = {

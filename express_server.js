@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
 const {urlDatabase, users} = require('./sitedata');
-const {generateRandomString, findUserEmail} = require('./helper_functions');
+const {generateRandomString, findUserEmail, urlsForUser} = require('./helper_functions');
 
 ////defining port
 const PORT = 8080;
@@ -33,8 +33,19 @@ app.get("/urls.json", (req, res) => {
 //will render HTML template with list of urls shortened
 
 app.get("/urls", (req, res) => {
-  const templateVars = {urls : urlDatabase, user : users[req.cookies["user_id"]]};
-  res.render("urls_index", templateVars);
+  const user = users[req.cookies["user_id"]];
+
+  if (user) {
+    const userUrls = urlsForUser(user.id, urlDatabase);
+    console.log(userUrls);
+    const templateVars = {urls : userUrls, user};
+    res.render("urls_index", templateVars);
+  } else {
+    const templateVars = {message: "You must be logged in to view this page", error: "401"};
+    res
+      .status(401)
+      .render("error_page", templateVars);
+  }
 });
 
 //will generate a new short url, store in database, and redirect to /urls
@@ -45,7 +56,7 @@ app.post("/urls", (req, res) => {
   if (user) {
     const shortURL = generateRandomString();
     const longURL = req.body.longURL;
-    urlDatabase[shortURL] = longURL;
+    urlDatabase[shortURL] = { longURL, userID : user.id };
     res.redirect(302, `/urls/${shortURL}`);
   } else {
     const templateVars = {message : 'You do not have permission to modify this URL. Please log in to continue', error : '401'};
@@ -143,7 +154,7 @@ app.get("/urls/new", (req, res) => {
 //will show a page with info for just requested url and option to edit long url
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user : users[req.cookies["user_id"]]};
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user : users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 
@@ -151,7 +162,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const newUrl = req.body.newUrl;
-  urlDatabase[req.params.id] = newUrl;
+  urlDatabase[req.params.id].longURL = newUrl;
   res.redirect(302, "/urls");
 });
 
@@ -166,7 +177,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   if (urlDatabase[req.params.id]) {
-    const longURL = urlDatabase[req.params.id];
+    const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(302, longURL);
   } else {
     const templateVars = { message: `The page you are looking for does not exist`, error : '404'};
