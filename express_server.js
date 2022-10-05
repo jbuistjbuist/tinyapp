@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
 const {urlDatabase, users} = require('./sitedata');
+const {generateRandomString} = require('./helper_functions');
 
 ////defining port
 const PORT = 8081;
