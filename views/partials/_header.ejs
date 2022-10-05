@@ -19,8 +19,8 @@
       </div>
     </div>
 
-    <% if (typeof username !== 'undefined') {  %>
-    <span class="navbar-text">Welcome, <%= username %>&nbsp;&nbsp;</span> 
+    <% if (typeof user !== 'undefined') {  %>
+    <span class="navbar-text">Welcome, <%= user.email; %>&nbsp;&nbsp;</span> 
       <form action="/logout" method="POST">
         <button type="submit" class="btn btn-danger">Logout</button>
       </form>
