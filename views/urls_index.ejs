@@ -38,7 +38,7 @@
               <td><form action="/urls/<%= id %>" method="GET">
                 <button type="submit" class="btn btn-outline-primary">Edit</button>
               </form></td>
-              <td><form action="/urls/<%= id %>/delete" method="POST">
+              <td><form action="/urls/<%= id %>/delete?_method=DELETE" method="POST">
                 <button type="submit" class="btn btn-outline-danger">Delete</button>
               </form></td>
             </tr>

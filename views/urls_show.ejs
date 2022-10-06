@@ -30,7 +30,7 @@
       </div>
       <div class="card-footer text-muted">
         <p class="h4">Edit</p>
-        <form action="/urls/<%= id %>" method="POST" name="newurl">
+        <form action="/urls/<%= id %>?_method=PUT" method="POST" name="newurl">
           <label for="newurl">New Url: </label>
           <input id="newurl" type="text" name="newUrl" placeholder="New Url Here...">
           <button type="submit" class="btn btn-primary">Submit</button>

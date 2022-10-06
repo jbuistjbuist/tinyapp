@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 const {urlDatabase, users} = require('./sitedata');
 const {generateRandomString, getUserByEmail, urlsForUser, canEditDelete} = require('./helper_functions');
 
@@ -13,8 +14,9 @@ const PORT = 8080;
 ////setting view engine
 app.set("view engine", "ejs");
 
-///middleware to translate request body and handle cookies
+///middleware to translate request body and handle cookies, and override methods
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'session',
   keys: ['hello', 'world']
@@ -65,6 +67,7 @@ app.post("/urls", (req, res) => {
       .render("error_page", templateVars);
   }
 });
+
 //route to the registration page. if already logged in, will redirect to /urls page
 
 app.get("/register", (req, res) => {
@@ -176,7 +179,7 @@ app.get("/urls/:id", (req, res) => {
 //upon submitting edit form, shorturl is associated to new provided longURL. if the user is not logged in or does not own the url
 //(or it doesnt exist), will throw an error.
 
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const newUrl = req.body.newUrl;
   const user = users[req.session.user_id];
 
@@ -195,7 +198,7 @@ app.post("/urls/:id", (req, res) => {
 //will delete long and short url from database when user presses delete button. if the user is not logged in or does not own the url
 //(or it doesnt exist), will throw an error.
 
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   const user = users[req.session.user_id];
 
   if (canEditDelete(req, users, urlDatabase)) {
