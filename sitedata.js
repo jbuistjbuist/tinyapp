@@ -1,4 +1,4 @@
-class Url {
+class Url {  //defining a class for Urls to add to database, to simplify adding the getters into each object
   constructor(shortURL, longURL, userID) {
     this.id = shortURL;
     this.longURL = longURL;
