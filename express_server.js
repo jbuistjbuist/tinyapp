@@ -34,12 +34,6 @@ app.get("/", (req, res) => {
   }
 });
 
-//function to get urls in JSON (deprecated)
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
 //will render HTML template with list of urls, unless the user is not logged in in which case it will desplay error message
 
 app.get("/urls", (req, res) => {
@@ -50,10 +44,7 @@ app.get("/urls", (req, res) => {
     const templateVars = {urls : userUrls, user};
     res.render("urls_index", templateVars);
   } else {
-    const templateVars = {message: "You must be logged in to view this page", error: "401"};
-    res
-      .status(401)
-      .render("error_page", templateVars);
+    res.redirect(302, '/login');
   }
 });
 
