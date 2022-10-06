@@ -1,4 +1,4 @@
-
+//generates a random string for use with ID generation
 
 const generateRandomString = function() {
   let string = '';
@@ -13,6 +13,8 @@ const generateRandomString = function() {
   return string;
 };
 
+//returns the user object if the user email is found in the data, else returns null
+
 const findUserEmail = function(email, data) {
   for (let obj in data) {
     let user = data[obj];
@@ -22,6 +24,8 @@ const findUserEmail = function(email, data) {
   }
   return null;
 };
+
+//locates all of the url objects associated with a provided user ID, and returns an object containing the matching URLS
 
 const urlsForUser = function(id, urlDatabase) {
   let output = {};
@@ -33,6 +37,8 @@ const urlsForUser = function(id, urlDatabase) {
   }
   return output;
 };
+
+//checks if a user is logged in and has access to a given url (here: id) in order to be able to edit or delete it
 
 const canEditDelete = function(req, users, urlDatabase) {
   const id = req.params.id;

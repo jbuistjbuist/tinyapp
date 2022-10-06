@@ -1,4 +1,4 @@
-
+//database for URL information
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -9,6 +9,8 @@ const urlDatabase = {
     userID: "UID67xy12",
   },
 };
+
+//dataBase for user information
 
 const users = {
   UID67xy12: {

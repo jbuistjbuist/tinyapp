@@ -21,16 +21,22 @@ app.use(cookieParser());
 //for now, redirect requests to home to /urls
 
 app.get("/", (req, res) => {
-  res.redirect(302, "/urls");
+  let user = users[req.cookies["user_id"]];
+  
+  if (user) {
+    res.redirect(302, "/urls");
+  } else {
+    res.redirect(302, "/login");
+  }
 });
 
-//function to get urls in JSON
+//function to get urls in JSON (deprecated)
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
 
-//will render HTML template with list of urls shortened
+//will render HTML template with list of urls, unless the user is not logged in in which case it will desplay error message
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -47,7 +53,7 @@ app.get("/urls", (req, res) => {
   }
 });
 
-//will generate a new short url, store in database, and redirect to /urls
+//will generate a new short url, store in database, and redirect to /urls if the user is logged in, else will display error message
 
 app.post("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -67,7 +73,7 @@ app.post("/urls", (req, res) => {
 
 });
 
-//route to the registration page
+//route to the registration page. if already logged in, will redirect to /urls page
 
 app.get("/register", (req, res) => {
   if (!req.cookies["user_id"]) {
@@ -78,7 +84,8 @@ app.get("/register", (req, res) => {
   
 });
 
-//when receiving a post from registration page, create a new user in users object and set a user_id cookie. notify user if they didnt fill out the form or user already exists
+//when receiving a post from registration page, create a new user in users object and set a user_id cookie.
+//notify user if they didnt fill out the form or user already exists
 
 app.post("/register", (req, res) => {
   if (req.body.email && req.body.password) {
@@ -102,6 +109,7 @@ app.post("/register", (req, res) => {
   }
 });
 
+//GET the login page. if user is already logged in, redirect to /urls
 
 app.get("/login", (req, res) => {
   if (!req.cookies["user_id"]) {
@@ -110,6 +118,8 @@ app.get("/login", (req, res) => {
     res.redirect(302, "/urls");
   }
 });
+
+//check if login information is correct (email registered and password correct). if not, display an error message
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -129,14 +139,14 @@ app.post("/login", (req, res) => {
   }
 });
 
-//when user pressed logout button, will clear user_id cookie and redirect to /urls. login form should reappear
+//when user pressed logout button, will clear user_id cookie and redirect to /urls.
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect(302, '/urls');
 });
 
-//to submit a new url.
+//to access the page for submitting a new url. if user is not logged in, redirect to login page
 
 app.get("/urls/new", (req, res) => {
   let user = users[req.cookies["user_id"]];
@@ -150,7 +160,7 @@ app.get("/urls/new", (req, res) => {
 
 });
 
-//will show a page with info for just requested url and option to edit long url
+//will show a page with info for just requested url and option to edit long url. if user does not have access to the url, will display an error
 
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -170,7 +180,8 @@ app.get("/urls/:id", (req, res) => {
   }
 });
 
-//upon submitting edit form, shorturl is associated to new provided longURL
+//upon submitting edit form, shorturl is associated to new provided longURL. if the user is not logged in or does not own the url
+//(or it doesnt exist), will throw an error.
 
 app.post("/urls/:id", (req, res) => {
   const newUrl = req.body.newUrl;
@@ -188,7 +199,8 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-//will delete long and short url from database when user presses delete button
+//will delete long and short url from database when user presses delete button. if the user is not logged in or does not own the url
+//(or it doesnt exist), will throw an error.
 
 app.post("/urls/:id/delete", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -206,7 +218,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
-//will redirect to the actual longURL website
+//will redirect to the actual longURL website if it exists, or will render an error page
 
 app.get("/u/:id", (req, res) => {
   if (urlDatabase[req.params.id]) {

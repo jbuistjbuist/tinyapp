@@ -19,6 +19,8 @@
       </div>
     </div>
 
+    <!-- if user exists, display their username and logout button, else display the login and register buttons on the navbar -->
+
     <% if (typeof user !== 'undefined') {  %>
     <span class="navbar-text">Welcome, <%= user.email; %>&nbsp;&nbsp;</span> 
       <form action="/logout" method="POST">
