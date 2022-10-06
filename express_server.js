@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 ////  DEFINING ROUTING   /////
 
-//for now, redirect requests to home to /urls
+//for now, redirect requests to home to /urls, or login if not logged in
 
 app.get("/", (req, res) => {
   let user = users[req.cookies["user_id"]];
