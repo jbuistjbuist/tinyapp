@@ -13,16 +13,21 @@ const urlDatabase = {
 //dataBase for user information
 
 const users = {
-  UID67xy12: {
-    id: "UID67xy12",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+  UIDvz757r: {
+    id: 'UIDvz757r',
+    email: 'user@example.com',
+    hashedPwd: '$2a$10$AP/2RZKc1Ds2cp2yYsRnleKQfCgizte5t2z6CzcNvAsUDTEyLRs6S' //purple-monkey-dinosaur
   },
-  UID53xyab: {
-    id: "UID53xyab",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
+  UIDp8a9rv: {
+    id: 'UIDp8a9rv',
+    email: 'user2@example.com',
+    hashedPwd: '$2a$10$wu5D6sflttPUNL4pMC5vTukvf.eIc6OMobhFmWa6QaXwFP06ueCRe' //dishwasher-funk
   },
+  UIDr59uw6: {
+    id: 'UIDr59uw6',
+    email: 'hi@hi.com',
+    hashedPwd: '$2a$10$3HpmOxjZIHEjgZd0dbVNHeT0z8pMcBke.NuvqKMOeSYbKFHJnqivm' //password is 1234
+  }
 };
 
 module.exports = {urlDatabase, users};

@@ -1,6 +1,7 @@
 ////calling dependencies
 const express = require("express");
 const app = express();
+const bcrypt = require("bcryptjs");
 const cookieParser = require('cookie-parser');
 const {urlDatabase, users} = require('./sitedata');
 const {generateRandomString, findUserEmail, urlsForUser, canEditDelete} = require('./helper_functions');
@@ -91,7 +92,9 @@ app.post("/register", (req, res) => {
   if (req.body.email && req.body.password) {
     if (!findUserEmail(req.body.email, users)) {
       const randomID = `UID${generateRandomString()}`;
-      users[randomID] = {id : randomID, email : req.body.email, password : req.body.password};
+      const hashedPwd = bcrypt.hashSync(req.body.password, 10);
+      users[randomID] = {id : randomID, email : req.body.email, hashedPwd};
+      console.log(users);
       res
         .cookie('user_id', randomID)
         .redirect(302, '/urls');
@@ -126,8 +129,8 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const user = findUserEmail(email, users);
   
-  if (user && user.password === password) {
-
+  if (user && bcrypt.compareSync(password, user.hashedPwd)) {
+  
     res
       .cookie('user_id', user.id)
       .redirect(302, '/urls');
