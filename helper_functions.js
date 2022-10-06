@@ -1,3 +1,5 @@
+
+
 const generateRandomString = function() {
   let string = '';
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -32,4 +34,25 @@ const urlsForUser = function(id, urlDatabase) {
   return output;
 };
 
-module.exports = {generateRandomString, findUserEmail, urlsForUser};
+const canEditDelete = function(req, users, urlDatabase) {
+  const id = req.params.id;
+  const user = users[req.cookies.user_id];
+  
+  if (!user) {
+    return false;
+  }
+
+  if (!urlDatabase[id]) {
+    return false;
+  }
+
+  const userUrlIds = Object.keys(urlsForUser(user.id, urlDatabase));
+
+  if (!userUrlIds.includes(id)) {
+    return false;
+  }
+
+  return true;
+};
+
+module.exports = {generateRandomString, findUserEmail, urlsForUser, canEditDelete};

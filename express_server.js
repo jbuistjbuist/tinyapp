@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
 const {urlDatabase, users} = require('./sitedata');
-const {generateRandomString, findUserEmail, urlsForUser} = require('./helper_functions');
+const {generateRandomString, findUserEmail, urlsForUser, canEditDelete} = require('./helper_functions');
 
 ////defining port
 const PORT = 8080;
@@ -37,7 +37,6 @@ app.get("/urls", (req, res) => {
 
   if (user) {
     const userUrls = urlsForUser(user.id, urlDatabase);
-    console.log(userUrls);
     const templateVars = {urls : userUrls, user};
     res.render("urls_index", templateVars);
   } else {
@@ -155,7 +154,10 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  const userUrlIds = Object.keys(urlsForUser(user.id, urlDatabase));
+  let userUrlIds;
+  if (user) {
+    userUrlIds = Object.keys(urlsForUser(user.id, urlDatabase));
+  }
 
   if (user && userUrlIds.includes(req.params.id)) {
     const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user : users[req.cookies["user_id"]]};
@@ -172,15 +174,36 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const newUrl = req.body.newUrl;
-  urlDatabase[req.params.id].longURL = newUrl;
-  res.redirect(302, "/urls");
+  const user = users[req.cookies["user_id"]];
+
+  if (canEditDelete(req, users, urlDatabase)) {
+    urlDatabase[req.params.id].longURL = newUrl;
+    res.redirect(302, "/urls");
+  } else {
+    const templateVars = {message: 'You are not authorized to edit this URL', error: "401", user};
+    res
+      .status(401)
+      .render("error_page", templateVars);
+    return;
+  }
 });
 
 //will delete long and short url from database when user presses delete button
 
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect(302, "/urls");
+  const user = users[req.cookies["user_id"]];
+
+  if (canEditDelete(req, users, urlDatabase)) {
+    delete urlDatabase[req.params.id];
+    res.redirect(302, "/urls");
+
+  } else {
+    const templateVars = {message: 'You are not authorized to edit this URL', error: "401", user};
+    res
+      .status(401)
+      .render("error_page", templateVars);
+    return;
+  }
 });
 
 //will redirect to the actual longURL website
