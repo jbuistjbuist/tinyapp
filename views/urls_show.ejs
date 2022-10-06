@@ -23,7 +23,7 @@
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+        <h5 class="card-title">TinyURL for: <%= URL.longURL %></h5>
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>" target="blank"><%= id %></a>
         </p>
@@ -40,21 +40,42 @@
 
     <div class="d-flex justify-content-around mt-5 w-50 mx-auto">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header font-weight-light">
           Total Page Visits
         </div>
-        <div class="card-body">
-          <h5 class="card-title">totalVisits</h5>
+        <div class="card-body d-flex justify-content-center bg-secondary text-white">
+          <h5 class="card-title"><%= URL.totalVisits %></h5>
         </div>
       </div>
       <div class="card">
-        <div class="card-header">
+        <div class="card-header font-weight-light">
           Unique Page Visits
         </div>
-        <div class="card-body">
-          <h5 class="card-title">uniqueVisits</h5>
+        <div class="card-body d-flex justify-content-center bg-secondary text-white">
+          <h5 class="card-title"><%= URL.uniqueVisits %></h5>
         </div>
       </div>
+    </div>
+    <div class="d-flex justify-content-around mt-5 w-75 mx-auto">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Visit #</th>
+            <th scope="col">Visitor ID</th>
+            <th scope="col">Visit Time</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+      
+        </tbody>
+      </table>
     </div>
     <!-- Bootstrap JS -->
     <script

@@ -19,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'session',
-  keys: ['hello', 'world']
+  keys: ['hello', 'world'],
+  maxAge: 604800000
 }));
 
 ////  DEFINING ROUTING   /////
@@ -160,13 +161,20 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
+  const shortUrl = req.params.id;
   let userUrlIds;
   if (user) {
     userUrlIds = Object.keys(urlsForUser(user.id, urlDatabase));
   }
 
-  if (user && userUrlIds.includes(req.params.id)) {
-    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user };
+  if (user && userUrlIds.includes(shortUrl)) {
+
+    const templateVars = {  //changing the template vars to include total and unique views, as well as the visit log
+      id: shortUrl,
+      URL : urlDatabase[shortUrl],
+      user
+    };
+
     res.render("urls_show", templateVars);
   } else {
     const templateVars = {message : 'You do not have permission to view this URL', error : '401', user};
@@ -217,10 +225,23 @@ app.delete("/urls/:id/delete", (req, res) => {
 //will redirect to the actual longURL website if it exists, or will render an error page
 
 app.get("/u/:id", (req, res) => {
-  if (urlDatabase[req.params.id]) {
-    const longURL = urlDatabase[req.params.id].longURL;
+  let id = req.params.id;
+  const visitID = `visit${generateRandomString()}`; //generates a random visit_id to be the key for the visit event log
+
+  if (urlDatabase[id]) {
+    
+    if (!req.session.visitorID) {
+      const visitorID = `Visitor_${generateRandomString()}`; //sets a visitor cookie in users browser if not already set
+      req.session.visitorID = visitorID;
+    }
+
+    urlDatabase[id].visitLog[visitID] = {visitorID : req.session.visitorID, time : Date(Date.now())}; //adds a visit log with visitor ID and time to the URL object
+    const longURL = urlDatabase[id].longURL;
+    console.log(urlDatabase);
     res.redirect(302, longURL);
+   
   } else {
+
     const templateVars = { message: `The page you are looking for does not exist`, error : '404', user : users[req.session.user_id]};
     res
       .status(404)

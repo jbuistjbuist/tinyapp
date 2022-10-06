@@ -28,7 +28,6 @@ const urlDatabase = {
   b6UTxQ: new Url('b6UTxQ', "https://www.tsn.ca", "UIDvz757r"),
   i3BoGr: new Url('i3BoGr', 'https://www.google.ca', 'UIDp8a9rv')
 };
-
 //dataBase for user information
 
 const users = {
