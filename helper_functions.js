@@ -15,7 +15,7 @@ const generateRandomString = function() {
 
 //returns the user object if the user email is found in the data, else returns null
 
-const findUserEmail = function(email, data) {
+const getUserByEmail = function(email, data) {
   for (let obj in data) {
     let user = data[obj];
     if (email === user.email) {
@@ -42,7 +42,7 @@ const urlsForUser = function(id, urlDatabase) {
 
 const canEditDelete = function(req, users, urlDatabase) {
   const id = req.params.id;
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   
   if (!user) {
     return false;
@@ -61,4 +61,4 @@ const canEditDelete = function(req, users, urlDatabase) {
   return true;
 };
 
-module.exports = {generateRandomString, findUserEmail, urlsForUser, canEditDelete};
+module.exports = {generateRandomString, getUserByEmail, urlsForUser, canEditDelete};

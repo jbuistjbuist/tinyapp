@@ -4,7 +4,7 @@ const app = express();
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
 const {urlDatabase, users} = require('./sitedata');
-const {generateRandomString, findUserEmail, urlsForUser, canEditDelete} = require('./helper_functions');
+const {generateRandomString, getUserByEmail, urlsForUser, canEditDelete} = require('./helper_functions');
 
 ////defining port
 const PORT = 8080;
@@ -17,15 +17,15 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: 
-})
+  keys: ['hello', 'world']
+}));
 
 ////  DEFINING ROUTING   /////
 
 //for now, redirect requests to home to /urls, or login if not logged in
 
 app.get("/", (req, res) => {
-  let user = users[req.cookies["user_id"]];
+  let user = users[req.session.user_id];
   
   if (user) {
     res.redirect(302, "/urls");
@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 //will render HTML template with list of urls, unless the user is not logged in in which case it will desplay error message
 
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
 
   if (user) {
     const userUrls = urlsForUser(user.id, urlDatabase);
@@ -60,7 +60,7 @@ app.get("/urls", (req, res) => {
 //will generate a new short url, store in database, and redirect to /urls if the user is logged in, else will display error message
 
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
 
   if (user) {
     const shortURL = generateRandomString();
@@ -73,14 +73,11 @@ app.post("/urls", (req, res) => {
       .status(401)
       .render("error_page", templateVars);
   }
-
-
 });
-
 //route to the registration page. if already logged in, will redirect to /urls page
 
 app.get("/register", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     res.render("urls_registration");
   } else {
     res.redirect(302, "/urls");
@@ -93,14 +90,13 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (req.body.email && req.body.password) {
-    if (!findUserEmail(req.body.email, users)) {
+    if (!getUserByEmail(req.body.email, users)) {
       const randomID = `UID${generateRandomString()}`;
       const hashedPwd = bcrypt.hashSync(req.body.password, 10);
       users[randomID] = {id : randomID, email : req.body.email, hashedPwd};
-      console.log(users);
-      res
-        .cookie('user_id', randomID)
-        .redirect(302, '/urls');
+      // eslint-disable-next-line camelcase
+      req.session.user_id = randomID;
+      res.redirect(302, '/urls');
     } else {
       const message = `User already exists! Please log in to access your account`;
       const templateVars = { message, error : '400' };
@@ -118,7 +114,7 @@ app.post("/register", (req, res) => {
 //GET the login page. if user is already logged in, redirect to /urls
 
 app.get("/login", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     res.render('urls_login');
   } else {
     res.redirect(302, "/urls");
@@ -130,13 +126,13 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = findUserEmail(email, users);
+  const user = getUserByEmail(email, users);
   
   if (user && bcrypt.compareSync(password, user.hashedPwd)) {
-  
-    res
-      .cookie('user_id', user.id)
-      .redirect(302, '/urls');
+    // eslint-disable-next-line camelcase
+    req.session.user_id = user.id;
+    res.redirect(302, '/urls');
+
   } else {
 
     const templateVars = {message : "User authentication failed", error : '403'};
@@ -148,14 +144,14 @@ app.post("/login", (req, res) => {
 //when user pressed logout button, will clear user_id cookie and redirect to /urls.
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  delete req.session.user_id;
   res.redirect(302, '/urls');
 });
 
 //to access the page for submitting a new url. if user is not logged in, redirect to login page
 
 app.get("/urls/new", (req, res) => {
-  let user = users[req.cookies["user_id"]];
+  let user = users[req.session.user_id];
 
   if (user) {
     const templateVars = { user };
@@ -169,14 +165,14 @@ app.get("/urls/new", (req, res) => {
 //will show a page with info for just requested url and option to edit long url. if user does not have access to the url, will display an error
 
 app.get("/urls/:id", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   let userUrlIds;
   if (user) {
     userUrlIds = Object.keys(urlsForUser(user.id, urlDatabase));
   }
 
   if (user && userUrlIds.includes(req.params.id)) {
-    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user : users[req.cookies["user_id"]]};
+    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user };
     res.render("urls_show", templateVars);
   } else {
     const templateVars = {message : 'You do not have permission to view this URL', error : '401', user};
@@ -191,7 +187,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const newUrl = req.body.newUrl;
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
 
   if (canEditDelete(req, users, urlDatabase)) {
     urlDatabase[req.params.id].longURL = newUrl;
@@ -209,7 +205,7 @@ app.post("/urls/:id", (req, res) => {
 //(or it doesnt exist), will throw an error.
 
 app.post("/urls/:id/delete", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
 
   if (canEditDelete(req, users, urlDatabase)) {
     delete urlDatabase[req.params.id];
@@ -231,7 +227,7 @@ app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(302, longURL);
   } else {
-    const templateVars = { message: `The page you are looking for does not exist`, error : '404', user : users[req.cookies['user_id']]};
+    const templateVars = { message: `The page you are looking for does not exist`, error : '404', user : users[req.session.user_id]};
     res
       .status(404)
       .render("error_page", templateVars);
