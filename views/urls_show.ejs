@@ -60,7 +60,6 @@
       <table class="table table-striped table-bordered">
         <thead>
           <tr>
-            <th scope="col">Visit #</th>
             <th scope="col">Visitor ID</th>
             <th scope="col">Visit Time</th>
           </tr>
@@ -68,11 +67,9 @@
 
         <tbody>
           <% for (let key in URL.visitLog) {
-            let visit = URL.visitLog[key];
-            let counter = 1; %>
+            let visit = URL.visitLog[key]; %>
           <tr>
-            <th scope="row"><%= counter %></th>
-            <td><%= visit.visitorID %></td>
+            <td scope='row'><%= visit.visitorID %></td>
             <td><%= visit.time %></td>
           </tr>
         <% } %>
