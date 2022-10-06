@@ -4,7 +4,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Landing page for logged in users to see their shortened URLs"](https://github.com/jbuistjbuist/tinyapp/blob/main/docs/urls_page.png)
+!["Landing page"](https://github.com/jbuistjbuist/tinyapp/blob/main/docs/urls_page.png)
 !["Page for each URL which provides the option to edit the URL, and displays information about total and unique visits to the URL"](https://github.com/jbuistjbuist/tinyapp/blob/main/docs/urls_show_page.png)
 !["Login form to access account"](https://github.com/jbuistjbuist/tinyapp/blob/main/docs/login_page.png)
 
