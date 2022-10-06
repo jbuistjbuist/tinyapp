@@ -1,13 +1,32 @@
-//database for URL information
+class Url {
+  constructor(shortURL, longURL, userID) {
+    this.id = shortURL;
+    this.longURL = longURL;
+    this.userID = userID;
+    this.visitLog = {};
+  }
+
+  get totalVisits() {
+    return Object.keys(this.visitLog).length;
+  }
+
+  get uniqueVisits() {
+    let visitorIds = [];
+    let count = 0;
+    for (let key in this.visitLog) {
+      let visit = this.visitLog[key];
+      if (!visitorIds.includes(visit.visitorID)) {
+        count++;
+      }
+      visitorIds.push(visit.visitorID);
+    }
+    return count;
+  }
+}
+
 const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "UIDvz757r",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "UIDp8a9rv",
-  },
+  b6UTxQ: new Url('b6UTxQ', "https://www.tsn.ca", "UIDvz757r"),
+  i3BoGr: new Url('i3BoGr', 'https://www.google.ca', 'UIDp8a9rv')
 };
 
 //dataBase for user information
@@ -30,4 +49,4 @@ const users = {
   }
 };
 
-module.exports = {urlDatabase, users};
+module.exports = {urlDatabase, users, Url};
