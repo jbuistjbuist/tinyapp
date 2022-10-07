@@ -32,7 +32,7 @@ const urlsForUser = function(id, urlDatabase) {
   for (let key in urlDatabase) {
     let url = urlDatabase[key];
     if (url.userID === id) {
-      output[key] = url;
+      output[key] = {...url, totalVisits: urlDatabase[key].totalVisits, uniqueVisits: urlDatabase[key].uniqueVisits};
     }
   }
   return output;

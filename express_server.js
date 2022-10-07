@@ -59,7 +59,7 @@ app.post("/urls", (req, res) => {
   if (user) {
     const shortURL = generateRandomString();
     const longURL = req.body.longURL;
-    urlDatabase[shortURL] = new Url(shortURL, longURL, user.id);
+    urlDatabase[shortURL] = new Url(shortURL, longURL, user.id, new Date((Date.now())).toDateString());
     res.redirect(302, `/urls/${shortURL}`);
   } else {
     const templateVars = {message : 'You do not have permission to modify this URL. Please log in to continue', error : '401'};

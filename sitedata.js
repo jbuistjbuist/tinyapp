@@ -1,8 +1,9 @@
 class Url {  //defining a class for Urls to add to database, to simplify adding the getters into each object
-  constructor(shortURL, longURL, userID) {
+  constructor(shortURL, longURL, userID, date) {
     this.id = shortURL;
     this.longURL = longURL;
     this.userID = userID;
+    this.creationDate = date;
     this.visitLog = {};
   }
 
@@ -25,10 +26,11 @@ class Url {  //defining a class for Urls to add to database, to simplify adding 
 }
 
 const urlDatabase = {
-  b6UTxQ: new Url('b6UTxQ', "https://www.tsn.ca", "UIDvz757r"),
-  i3BoGr: new Url('i3BoGr', 'https://www.google.ca', 'UIDp8a9rv')
+  b6UTxQ: new Url('b6UTxQ', "https://www.tsn.ca", "UIDvz757r", "Fri Oct 07 2022"),
+  i3BoGr: new Url('i3BoGr', 'https://www.google.ca', 'UIDp8a9rv', "Fri Oct 07 2022")
 };
-//dataBase for user information
+//dataBase for user information;
+
 
 const users = {
   UIDvz757r: {
