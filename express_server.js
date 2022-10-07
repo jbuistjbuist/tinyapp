@@ -237,7 +237,6 @@ app.get("/u/:id", (req, res) => {
 
     urlDatabase[id].visitLog[visitID] = {visitorID : req.session.visitorID, time : Date(Date.now())}; //adds a visit log with visitor ID and time to the URL object
     const longURL = urlDatabase[id].longURL;
-    console.log(urlDatabase);
     res.redirect(302, longURL);
    
   } else {
