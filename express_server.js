@@ -20,7 +20,7 @@ app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'session',
   keys: ['hello', 'world'],
-  maxAge: 604800000 //increasing maxAge to make for better tracking of unique visits
+  maxAge: 604800000
 }));
 
 ////  DEFINING ROUTING   /////
